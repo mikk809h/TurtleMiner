@@ -1,1 +1,1 @@
-"# TurtleMiner" 
+# TurtleMiner Program for ComputerCraft in Minecraft
