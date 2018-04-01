@@ -67,11 +67,20 @@ end
 
 function move()
     refuel()
-    while turtle.detect() do
+    while turtle.forward() do
         turtle.dig()
-        sleep(1)
+        turtle.attack()
+        sleep(.1)
     end
-    turtle.forward()
+    if Config.Orientation == 0 then
+        Config:Update("X", Config.X + 1)
+    elseif Config.Orientation == 1 then
+        Config:Update("Z", Config.Z + 1)
+    elseif Config.Orientation == 2 then
+        Config:Update("X", Config.X - 1)
+    elseif Config.Orientation == 3 then
+        Config:Update("Z", Config.Z - 1)
+    end
 end
 
 function moveBack()
@@ -121,20 +130,21 @@ function main()
         Config:Update("State", "moving X")
         return true
     elseif Config.State == "moving X" then
+        while Config.Orientation ~= 0 do
+            turnRight()
+        end
         local toMoveX = Config.Pattern.X - Config.X
-
         while toMoveX > 0 do
             move()
             toMoveX = toMoveX - 1
         end
-        turnRight()
+        while Config.Orientation ~= 1 do
+            turnRight()
+        end
         Config:Update("State", "moving Z")
         return true
     elseif Config.State == "moving Z" then
-        print("MOVING Z")
-        print("ORIENTATION: " .. Config.Orientation)
         local toMoveZ = Config.Pattern.Z - Config.Z
-
         while toMoveZ > 0 do
             move()
             toMoveZ = toMoveZ - 1
@@ -142,6 +152,9 @@ function main()
         while Config.Orientation ~= 0 do
             turnLeft()
         end
+
+        Config:Update("X", 0)
+        Config:Update("Z", 0)
         Config:Update("State", "idle")
         return true
     end
