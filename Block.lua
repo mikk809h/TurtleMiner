@@ -2,8 +2,14 @@ local Block = {}
 
 Block.Name = ""
 Block.State = {}
-Block.Metadata = 0
+Block.Metadata = -1
+Block.Blacklisted = false
 
+TurtleMiner = TurtleMiner or {
+    Path = "/github",
+}
+
+local BlacklistClass = loadfile(fs.combine(TurtleMiner.Path, "Blacklist.lua"))()
 --[[
 
 state = {
@@ -16,6 +22,7 @@ function Block:Init(arg)
     if not self then
         self = arg or Block
     end
+
     if not turtle then
         Block = {}
         self = Block
@@ -27,13 +34,24 @@ function Block:Get(arg)
     if not self then
         self = arg or Block
     end
-    local isblock, blockData = turtle.inspect()
+    local isBlock, blockData = turtle.inspect()
     if isBlock then
         self.Name = blockData.name
         self.Metadata = blockData.metadata
         self.State = blockData.state
+        self.Blacklisted = BlacklistClass:IsBlacklisted(self.Name)
     end
 end
+
+function Block:Mine(arg)
+    if not self then
+        self = arg or Block
+    end
+    if not self.Blacklisted then
+        
+    end
+end
+
 
 local BlockMetatable = {}
 
