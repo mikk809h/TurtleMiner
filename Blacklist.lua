@@ -13,4 +13,4 @@ function Blacklist:IsBlacklisted(input)
     return false
 end
 
-return setmetatable(_ENV, Blacklist)
+return setmetatable(Blacklist, _ENV)
