@@ -1,6 +1,6 @@
 local Blacklist = {}
 
-local Blacklist.rawBlacklist = {
+Blacklist.rawBlacklist = {
     "cobblestone", "stone", "gravel", "dirt", "grass", "sand", "planks", "log"
 }
 
