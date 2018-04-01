@@ -22,10 +22,18 @@ Config.Pattern = Config.Pattern or {
 
 Config.MinimumFuelLevel = Config.MinimumFuelLevel or 100
 Config.MaximumFuelLevel = Config.MaximumFuelLevel or 500
-
+Config.CurrentFuelLevel = turtle.getFuelLevel()
 Config:Save()
 
+rednet.open("left")
+
 function refuel()
+    term.clear()
+    term.setCursorPos(1,1)
+    Config:Update("CurrentFuelLevel", turtle.getFuelLevel())
+    print(textutils.serialize(Config.Config))
+    rednet.broadcast(textutils.serialize(Config.Config))
+    sleep(5)
     if turtle.getFuelLevel() < Config.MinimumFuelLevel then
         local slot = 1
         while turtle.getFuelLevel() < Config.MaximumFuelLevel do
@@ -160,15 +168,4 @@ function main()
     end
 end
 
-parallel.waitForAny(
-    function()
-        while main() do sleep(2.5) end
-    end, function()
-    while true do
-        term.clear()
-        term.setCursorPos(1,1)
-        print(textutils.serialize(Config.Config))
-        sleep(1)
-    end
-    end
-)
+while main() do sleep(2.5) end
