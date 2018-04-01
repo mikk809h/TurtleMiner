@@ -13,4 +13,5 @@ state = {
 ]]
 function Block:New()
 
+    return self
 end
