@@ -1,7 +1,7 @@
 local Blacklist = {}
 
 Blacklist.rawBlacklist = {
-    "cobblestone", "stone", "gravel", "dirt", "grass", "sand", "planks", "log"
+    "cobblestone", "stone", "gravel", "dirt", "grass", "sand", "planks", "log", "bedrock"
 }
 
 function Blacklist:IsBlacklisted(input)
