@@ -47,6 +47,21 @@ function Block:Get(arg)
     end
 end
 
+function Block:IsBedrockBelow()
+    if not self then
+        self = arg or Block
+    end
+    local isBlock, blockData = turtle.inspectDown()
+    if isBlock then
+        if string.find(blockData.name, "bedrock") then
+            print("Bedrock")
+            return true
+        end
+    end
+    return false
+end
+
+
 function Block:Mine(arg, force)
     if not self then
         self = arg or Block

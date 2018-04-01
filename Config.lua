@@ -44,4 +44,14 @@ function Config:Save()
     handle.close()
 end
 
-return setmetatable(Config, _ENV)
+local mt = {}
+
+function mt.__index(k, v)
+    return k.Config[v]
+end
+function mt.__newindex(t, k, v)
+    t.Config[k] = v
+end
+
+
+return setmetatable(Config, mt)
