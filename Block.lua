@@ -24,10 +24,13 @@ function Block:Init(arg)
     end
 
     if not turtle then
-        Block = {}
-        self = Block
         return false
     end
+
+    self.Name = ""
+    self.State = {}
+    self.Metadata = -1
+    self.Blacklisted = false
 end
 
 function Block:Get(arg)
@@ -48,10 +51,13 @@ function Block:Mine(arg)
         self = arg or Block
     end
     if not self.Blacklisted then
-        
+        self.Name = ""
+        self.State = {}
+        self.Metadata = -1
+        self.Blacklisted = false
+        return turtle.dig()
     end
 end
-
 
 local BlockMetatable = {}
 
