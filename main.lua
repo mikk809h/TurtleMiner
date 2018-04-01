@@ -22,9 +22,7 @@ SETUP
 ]]
 if fs.exists(fs.combine(TurtleMiner.Path, ".turtleminercfg")) then
     local cfg = fs.open(fs.combine(TurtleMiner.Path, ".turtleminercfg"), "r")
-
     TurtleMiner = textutils.unserialize(cfg.readAll())
-
     cfg.close()
 end
 
