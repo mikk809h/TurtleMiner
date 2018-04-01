@@ -21,7 +21,7 @@ Config.Pattern = Config.Pattern or {
 }
 
 Config.MinimumFuelLevel = Config.MinimumFuelLevel or 100
-Config.MaximumFuelLevel = Config.MaximumFuelLevel or 1000
+Config.MaximumFuelLevel = Config.MaximumFuelLevel or 500
 
 Config:Save()
 
@@ -67,7 +67,7 @@ end
 
 function move()
     refuel()
-    while turtle.forward() do
+    while not turtle.forward() do
         turtle.dig()
         turtle.attack()
         sleep(.1)
@@ -107,7 +107,6 @@ function main()
         return true
     elseif Config.State == "down" then
         while not Block:IsBedrockBelow() do
-            print("Orientation " .. Config.Orientation)
             while Config.Orientation <= 3 do
                 Block:Mine()
                 turnRight()
@@ -141,6 +140,7 @@ function main()
         while Config.Orientation ~= 1 do
             turnRight()
         end
+        Config:Update("X", 0)
         Config:Update("State", "moving Z")
         return true
     elseif Config.State == "moving Z" then
@@ -153,12 +153,21 @@ function main()
             turnLeft()
         end
 
-        Config:Update("X", 0)
         Config:Update("Z", 0)
         Config:Update("State", "idle")
         return true
     end
 end
 
-
-while main() do sleep(2.5) end
+parallel.waitForAny(
+    function()
+        while main() do sleep(2.5) end
+    end, function()
+    while true do
+        term.clear()
+        term.setCursorPos(1,1)
+        print(textutils.serialize(Config.Config))
+        sleep(1)
+    end
+    end
+)
