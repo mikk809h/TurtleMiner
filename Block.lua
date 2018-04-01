@@ -50,12 +50,15 @@ function Block:Mine(arg)
     if not self then
         self = arg or Block
     end
+
     if not self.Blacklisted then
         self.Name = ""
         self.State = {}
         self.Metadata = -1
         self.Blacklisted = false
         return turtle.dig()
+    else
+        return false, "Blacklisted block"
     end
 end
 
