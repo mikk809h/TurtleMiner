@@ -101,8 +101,9 @@ end
 
 function main()
     if Config.State == "idle" then
-        moveDown()
-        moveDown()
+        while Config.Y > -2 do
+            moveDown()
+        end
         Config:Update("State", "down")
         return true
     elseif Config.State == "down" then
