@@ -23,9 +23,16 @@ function Block:Init(arg)
     end
 end
 
-function Block:Get()
+function Block:Get(arg)
+    if not self then
+        self = arg or Block
+    end
     local isblock, blockData = turtle.inspect()
-
+    if isBlock then
+        self.Name = blockData.name
+        self.Metadata = blockData.metadata
+        self.State = blockData.state
+    end
 end
 
 local BlockMetatable = {}
