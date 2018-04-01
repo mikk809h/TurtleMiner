@@ -31,6 +31,7 @@ function Block:Init(arg)
     self.State = {}
     self.Metadata = -1
     self.Blacklisted = false
+    self:Get()
 end
 
 function Block:Get(arg)
@@ -46,17 +47,20 @@ function Block:Get(arg)
     end
 end
 
-function Block:Mine(arg)
+function Block:Mine(arg, force)
     if not self then
         self = arg or Block
+    else
+        self:Get()
+        force = arg
     end
 
-    if not self.Blacklisted then
+    if force or self.Blacklisted == false then
         self.Name = ""
         self.State = {}
         self.Metadata = -1
         self.Blacklisted = false
-        return turtle.dig()
+        return turtle.dig(), force and "Forced" or nil
     else
         return false, "Blacklisted block"
     end
