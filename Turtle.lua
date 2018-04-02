@@ -1,5 +1,9 @@
 local Turtle = {}
 
+
+TurtleMiner = TurtleMiner or {}
+TurtleMiner.Path    = TurtleMiner.Path or "/github"
+
 local Config = Config or nil
 
 if not Config then
@@ -11,6 +15,8 @@ Config.Orientation = Config.Orientation or 0
 Config.Y = Config.Y or 0
 Config.X = Config.X or 0
 Config.Z = Config.Z or 0
+
+Turtle.Inventory = loadfile(fs.combine(TurtleMiner.Path, "Inventory.lua"))()
 
 function Turtle:Move(arg, direction)
     if not self then
@@ -121,6 +127,10 @@ function Turtle:Turn(arg, direction)
     else
         return false, "Direction " .. direction .. " invalid!"
     end
+end
+
+function Turtle:Inventory(arg)
+    return self.Inventory
 end
 
 

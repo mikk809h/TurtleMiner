@@ -53,13 +53,104 @@ function Block:IsBedrockBelow()
     end
     local isBlock, blockData = turtle.inspectDown()
     if isBlock then
-        if string.find(blockData.name, "bedrock") then
+        if blockData.name == "minecraft:bedrock" then
             return true
         end
     end
     return false
 end
 
+function Block:IsBedrockInFront()
+    if not self then
+        self = arg or Block
+    end
+    local isBlock, blockData = turtle.inspect()
+    if isBlock then
+        if blockData.name == "minecraft:bedrock" then
+            return true
+        end
+    end
+    return false
+end
+
+function Block:DropBlacklisted()
+    local slotsHasItems = 0
+    for i = 1, 16 do
+        if turtle.getItemCount(i) > 0 then
+            slotsHasItems = slotsHasItems + 1
+        end
+    end
+    if slotsHasItems >= 15 then
+        for i = 16, 1, -1 do
+            local d = turtle.getItemDetail(i)
+            if d then
+                if d.name == "minecraft:cobblestone" then
+                    if d.damage == 1 or d.damge == 2 or d.damage == 3 or d.damage == 4 then
+                        turtle.select(i)
+                        turtle.drop(d.count)
+                    end
+                else
+                    if BlacklistClass:IsBlacklisted(d.name) then
+                        turtle.select(i)
+                        turtle.drop(d.count)
+                    end
+                end
+            end
+        end
+        local slotTo = 16
+        local slotReversed = 15
+        while true do
+            if turtle.getItemCount(slotReversed) > 0 then
+                turtle.select(slotReversed)
+                turtle.transferTo(slotTo)
+            end
+            if slotReversed ~= 1 and slotTo ~= 1 then
+                slotReversed = slotReversed - 1
+            elseif slotReversed == 1 and slotTo ~= 2 then
+                slotTo = slotTo - 1
+                slotReversed = slotTo - 1
+            elseif slotTo == 2 then
+                break
+            end
+            sleep(.05)
+        end
+
+        local invCache = {}
+        for i = 1, 16 do
+            invCache[i] = turtle.getItemDetail(i)
+        end
+        local blockCache = {}
+        for i = 1, 16 do
+            if invCache[i] then
+                local name = invCache[i].name .. ":" .. invCache[i].damage
+                if blockCache[name] then
+                    blockCache[name] = blockCache[name] + invCache[i].count
+                else
+                    blockCache[name] = invCache[i].count
+                end
+            end
+        end
+
+        if blockCache["minecraft:cobblestone:0"] > 64 then
+            local lastCobbleSlot = 1
+            for i = 1, 16 do
+                if invCache[i] then
+                    if invCache[i].name == "minecraft:cobblestone" then
+                        lastCobbleSlot = i
+                    end
+                end
+            end
+            for i = 1, lastCobbleSlot > 1 and lastCobbleSlot-1 or 1 do
+                if invCache[i] then
+                    if invCache[i].name == "minecraft:cobblestone" and i ~= lastCobbleSlot then
+                        turtle.select(i)
+                        turtle.drop(invCache[i].count)
+                    end
+                end
+            end
+        end
+    end
+end
 
 function Block:Mine(arg, force)
     if not self then
@@ -68,6 +159,8 @@ function Block:Mine(arg, force)
         self:Get()
         force = arg
     end
+
+    self:DropBlacklisted()
 
     if force or self.Blacklisted == false then
         self.Name = ""

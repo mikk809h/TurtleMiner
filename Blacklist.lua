@@ -1,12 +1,12 @@
 local Blacklist = {}
 
 Blacklist.rawBlacklist = {
-    "cobblestone", "stone", "gravel", "dirt", "grass", "sand", "planks", "log", "bedrock"
+    "minecraft:cobblestone", "minecraft:stone", "minecraft:gravel", "minecraft:dirt", "minecraft:grass", "minecraft:sand", "minecraft:planks", "minecraft:log", "minecraft:bedrock"
 }
 
 function Blacklist:IsBlacklisted(input)
     for k,v in pairs(self.rawBlacklist) do
-        if string.find(input, v) then
+        if input == v then
             return true
         end
     end

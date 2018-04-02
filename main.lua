@@ -43,6 +43,7 @@ function refuel()
             end
         end
     end
+    turtle.select(1)
 end
 
 function moveDown()
@@ -120,16 +121,94 @@ function main()
             end
             moveDown()
         end
+        Config:Update("State", "to move low")
+        return true
+    elseif Config.State == "to move low" then
+        while Block:IsBedrockInFront() do
+            moveUp()
+        end
+        for i = 1, 16 do
+            turtle.select(i)
+            local slotData = turtle.getItemDetail(i)
+            if slotData ~= nil then
+                if slotData.name == "minecraft:cobblestone" then
+                    turtle.placeDown()
+                end
+            end
+        end
+        Config:Update("State", "moving X low")
+        return true
+    elseif Config.State == "moving X low" then
+        while Config.Orientation ~= 0 do
+            turnRight()
+        end
+        while Block:IsBedrockInFront() do
+            moveUp()
+        end
+        local toMoveX = Config.Pattern.X - Config.X
+        while toMoveX > 0 do
+            move()
+            toMoveX = toMoveX - 1
+        end
+        while Config.Orientation ~= 1 do
+            turnRight()
+        end
+        Config:Update("X", 0)
+        Config:Update("State", "moving Z low")
+        return true
+    elseif Config.State == "moving Z low" then
+        while Block:IsBedrockInFront() do
+            moveUp()
+        end
+        local toMoveZ = Config.Pattern.Z - Config.Z
+        while toMoveZ > 0 do
+            move()
+            toMoveZ = toMoveZ - 1
+        end
+        while Config.Orientation ~= 0 do
+            turnLeft()
+        end
+
+        Config:Update("Z", 0)
+        Config:Update("State", "quickdown_low")
+        return true
+    elseif Config.State == "quickdown_low" then
+        while not Block:IsBedrockBelow() do
+            while Config.Orientation <= 3 do
+                Block:Mine()
+                turnRight()
+                if Config.Orientation == 0 then
+                    break
+                end
+            end
+            moveDown()
+        end
         Config:Update("State", "up")
         return true
     elseif Config.State == "up" then
-        while Config.Y < 0 do
+        while Config.Y < -1 do
+            while Config.Orientation <= 3 do
+                Block:Mine()
+                turnRight()
+                if Config.Orientation == 0 then
+                    break
+                end
+            end
             moveUp()
         end
+        moveUp()
         Config:Update("State", "to move")
         return true
     elseif Config.State == "to move" then
-        for i = 1, 16 do turtle.select(i) turtle.placeDown() end
+        for i = 1, 16 do
+            turtle.select(i)
+            local slotData = turtle.getItemDetail(i)
+            if slotData ~= nil then
+                if slotData.name == "minecraft:cobblestone" then
+                    turtle.placeDown()
+                end
+            end
+        end
         Config:Update("State", "moving X")
         return true
     elseif Config.State == "moving X" then
@@ -163,4 +242,4 @@ function main()
     end
 end
 
-while main() do sleep(2.5) end
+while main() do sleep(1.5) end
