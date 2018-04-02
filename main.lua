@@ -33,7 +33,6 @@ function refuel()
     Config:Update("CurrentFuelLevel", turtle.getFuelLevel())
     print(textutils.serialize(Config.Config))
     rednet.broadcast(textutils.serialize(Config.Config))
-    sleep(5)
     if turtle.getFuelLevel() < Config.MinimumFuelLevel then
         local slot = 1
         while turtle.getFuelLevel() < Config.MaximumFuelLevel do
