@@ -26,12 +26,8 @@ Config.CurrentFuelLevel = turtle.getFuelLevel()
 Config:Save()
 
 rednet.open("left")
-
 function refuel()
-    term.clear()
-    term.setCursorPos(1,1)
     Config:Update("CurrentFuelLevel", turtle.getFuelLevel())
-    print(textutils.serialize(Config.Config))
     rednet.broadcast(textutils.serialize(Config.Config))
     if turtle.getFuelLevel() < Config.MinimumFuelLevel then
         local slot = 1
