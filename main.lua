@@ -102,7 +102,6 @@ function turnLeft()
     Config:Update("Orientation", Config.Orientation > 0 and Config.Orientation - 1 or 3)
 end
 
-
 function main()
     if Config.State == "idle" then
         while Config.Y > -2 do

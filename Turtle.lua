@@ -16,13 +16,7 @@ Config.Y = Config.Y or 0
 Config.X = Config.X or 0
 Config.Z = Config.Z or 0
 
-function Turtle:Move(arg, direction)
-    if not self then
-        self = Turtle
-    else
-        direction = arg
-    end
-
+function Turtle:Move(direction)
     if direction == "up" then
         while not turtle.up() do
             turtle.digUp()
@@ -74,13 +68,7 @@ function Turtle:Move(arg, direction)
     end
 end
 
-function Turtle:Turn(arg, direction)
-    if not self then
-        self = Turtle
-    else
-        direction = arg
-    end
-
+function Turtle:Turn(direction)
     if direction == "north" then
         if Config.Orientation > 0 and Config.Orientation <= 2 then
             repeat
@@ -127,8 +115,20 @@ function Turtle:Turn(arg, direction)
     end
 end
 
-function Turtle:Place(direction)
-
+function Turtle:Place(direction, block)
+    self:Turn(direction)
+    if direction == "up" then
+        if force then
+            while not turtle.placeUp() do
+                turtle.digUp()
+                turtle.attackUp()
+                sleep(.5)
+            end
+    elseif direction == "down" then
+        turtle.placeDown()
+    else
+        turtle.place()
+    end
 end
 
 local mt = {}
