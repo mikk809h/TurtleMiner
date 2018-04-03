@@ -1,4 +1,4 @@
 # TurtleMiner Program for ComputerCraft in Minecraft
 
 
-#### Current Version : 0.02
+#### Current Version : 0.05
