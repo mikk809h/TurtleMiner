@@ -1,7 +1,6 @@
 local Config = {}
 
 Config.Path = "/.config"
-
 Config.Config = {}
 
 function Config:Init()

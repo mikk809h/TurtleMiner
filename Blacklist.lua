@@ -1,5 +1,4 @@
 local Blacklist = {}
-
 Blacklist.rawBlacklist = {
     "minecraft:cobblestone", "minecraft:stone", "minecraft:gravel", "minecraft:dirt", "minecraft:grass", "minecraft:sand", "minecraft:planks", "minecraft:log", "minecraft:bedrock"
 }

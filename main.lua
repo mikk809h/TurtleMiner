@@ -108,6 +108,15 @@ function main()
         while Config.Y > -2 do
             moveDown()
         end
+        for i = 1, 16 do
+            local slotData = turtle.getItemDetail(i)
+            if slotData ~= nil then
+                if slotData.name == "minecraft:cobblestone" then
+                    turtle.select(i)
+                    turtle.placeUp()
+                end
+            end
+        end
         Config:Update("State", "down")
         return true
     elseif Config.State == "down" then
@@ -128,10 +137,10 @@ function main()
             moveUp()
         end
         for i = 1, 16 do
-            turtle.select(i)
             local slotData = turtle.getItemDetail(i)
             if slotData ~= nil then
                 if slotData.name == "minecraft:cobblestone" then
+                    turtle.select(i)
                     turtle.placeDown()
                 end
             end

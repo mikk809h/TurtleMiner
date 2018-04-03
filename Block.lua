@@ -18,11 +18,7 @@ state = {
 
 ]]
 
-function Block:Init(arg)
-    if not self then
-        self = arg or Block
-    end
-
+function Block:Init()
     if not turtle then
         return false
     end
@@ -34,10 +30,7 @@ function Block:Init(arg)
     self:Get()
 end
 
-function Block:Get(arg)
-    if not self then
-        self = arg or Block
-    end
+function Block:Get()
     local isBlock, blockData = turtle.inspect()
     if isBlock then
         self.Name = blockData.name
@@ -48,9 +41,6 @@ function Block:Get(arg)
 end
 
 function Block:IsBedrockBelow()
-    if not self then
-        self = arg or Block
-    end
     local isBlock, blockData = turtle.inspectDown()
     if isBlock then
         if blockData.name == "minecraft:bedrock" then
@@ -61,9 +51,6 @@ function Block:IsBedrockBelow()
 end
 
 function Block:IsBedrockInFront()
-    if not self then
-        self = arg or Block
-    end
     local isBlock, blockData = turtle.inspect()
     if isBlock then
         if blockData.name == "minecraft:bedrock" then
@@ -152,14 +139,7 @@ function Block:DropBlacklisted()
     end
 end
 
-function Block:Mine(arg, force)
-    if not self then
-        self = arg or Block
-    else
-        self:Get()
-        force = arg
-    end
-
+function Block:Mine(force)
     self:DropBlacklisted()
 
     if force or self.Blacklisted == false then

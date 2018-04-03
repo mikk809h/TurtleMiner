@@ -16,8 +16,6 @@ Config.Y = Config.Y or 0
 Config.X = Config.X or 0
 Config.Z = Config.Z or 0
 
-Turtle.Inventory = loadfile(fs.combine(TurtleMiner.Path, "Inventory.lua"))()
-
 function Turtle:Move(arg, direction)
     if not self then
         self = Turtle
@@ -129,10 +127,9 @@ function Turtle:Turn(arg, direction)
     end
 end
 
-function Turtle:Inventory(arg)
-    return self.Inventory
-end
+function Turtle:Place(direction)
 
+end
 
 local mt = {}
 
