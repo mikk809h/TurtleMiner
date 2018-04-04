@@ -145,6 +145,7 @@ end
 
 function Turtle:Refuel()
     Config:Update("CurrentFuelLevel", turtle.getFuelLevel())
+    
     if turtle.getFuelLevel() < Config.MinimumFuelLevel then
         local slot = 1
         while turtle.getFuelLevel() < Config.MaximumFuelLevel do
