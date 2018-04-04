@@ -115,7 +115,7 @@ function Turtle:Turn(direction)
     end
 end
 
-function Turtle:Place(direction, block)
+function Turtle:Place(direction, force)
     self:Turn(direction)
     if direction == "up" then
         if force then
@@ -124,11 +124,42 @@ function Turtle:Place(direction, block)
                 turtle.attackUp()
                 sleep(.5)
             end
+        end
     elseif direction == "down" then
         turtle.placeDown()
     else
         turtle.place()
     end
+end
+
+function Turtle:Dig(direction)
+    self:Turn(direction)
+    if direction == "up" then
+        turtle.digUp()
+    elseif direction == "down" then
+        turtle.digDown()
+    else
+        turtle.dig()
+    end
+end
+
+function Turtle:Refuel()
+    Config:Update("CurrentFuelLevel", turtle.getFuelLevel())
+    if turtle.getFuelLevel() < Config.MinimumFuelLevel then
+        local slot = 1
+        while turtle.getFuelLevel() < Config.MaximumFuelLevel do
+            turtle.select(slot)
+            if turtle.refuel(0) then
+                turtle.refuel(1)
+            else
+                slot = slot < 16 and slot + 1 or 1
+                if slot == 1 then
+                    os.pullEvent("turtle_inventory")
+                end
+            end
+        end
+    end
+    turtle.select(1)
 end
 
 local mt = {}
