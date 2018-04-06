@@ -4,7 +4,7 @@ TurtleMiner = TurtleMiner or {}
 TurtleMiner.Path    = TurtleMiner.Path or "/github"
 
 Turtle.TurtleLog = loadfile(fs.combine(TurtleMiner.Path, "TurtleLog.lua"))()
-local Config = nil
+Config = Config or nil
 
 if not Config then
     Config = loadfile(fs.combine(TurtleMiner.Path, "Config.lua"))()

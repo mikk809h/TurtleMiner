@@ -3,26 +3,25 @@ local Miner = {}
 TurtleMiner = TurtleMiner or {}
 TurtleMiner.Path    = TurtleMiner.Path or "/github"
 
-local Config = Config or loadfile(fs.combine(TurtleMiner.Path, "Config.lua"))()
+Config = Config or loadfile(fs.combine(TurtleMiner.Path, "Config.lua"))()
 Config:Init()
 
 local Turtle = loadfile(fs.combine(TurtleMiner.Path, "Turtle.lua"))()
 Turtle:Init()
-
 local Block = loadfile(fs.combine(TurtleMiner.Path, "Block.lua"))()
 Block:Init()
 
-Config.MinerState       = Config.MinerState or "idle"
+Config.MinerState = Config.MinerState or "begin"
 
 Config.Pattern = Config.Pattern or {
     X = 1,
     Z = 2,
 }
 
-Config.MinimumFuelLevel = Config.MinimumFuelLevel or 100
-Config.MaximumFuelLevel = Config.MaximumFuelLevel or 500
+Config.MinimumFuelLevel = 100
+Config.MaximumFuelLevel = 500
 Config.CurrentFuelLevel = turtle.getFuelLevel()
-Config.ThresholdCoords  = Config.ThresholdCoords or vector.new(0, 7, 0);
+Config.ThresholdCoords  = vector.new(0, 7, 0);
 Config:Save()
 
 function Miner:Main()
@@ -30,15 +29,17 @@ function Miner:Main()
     while self.Running do
         -- Check if forced termination and continue from last save.
         if Config.MinerState == "begin" then
+            Turtle:Locate()
+
             if not Config.MinerHasBegun then
                 Config:Update("BeginCoords", vector.new(Config.X, Config.Y, Config.Z))
                 Config:Update("MinerHasBegun", true)
             end
-            while Config.Y >= BeginCoords.y - 2 do
+            while Config.Y >= Config.BeginCoords.y - 2 do
                 Turtle:Move("down")
             end
-            Config:Update("MinerState", "begin_fillhole")
-        elseif Config.MinerState == "begin_fillhole" then
+            Config:Update("MinerState", "beginFillHole")
+        elseif Config.MinerState == "beginFillHole" then
             Turtle:Select("minecraft:cobblestone")
             if turtle.detectUp() then
                 Turtle:Place("up")
@@ -62,12 +63,12 @@ function Miner:Main()
             end
             Config:Update("MinerState", "firstToNextNorth")
         elseif Config.MinerState == "firstToNextNorth" then
-            while Config.Z % Config.Pattern.Z > Config.Pattern.Z do
+            while Config.Z - BeginCoords.z % Config.Pattern.Z ~= 0 do
                 Turtle:Move("north")
             end
             Config:Update("MinerState", "firstToNextEast")
         elseif Config.MinerState == "firstToNextEast" then
-            while Config.X % Config.Pattern.X < Config.Pattern.X do
+            while Config.X - BeginCoords.x % Config.Pattern.X ~= 0 do
                 Turtle:Move("east")
             end
             Config:Update("MinerState", "firstToTurnSecond")
@@ -106,6 +107,19 @@ function Miner:Main()
         elseif Config.MinerState == "secondToUpFill" then
             Turtle:Select("minecraft:cobblestone")
             Turtle:Place("down")
+            Config:Update("MinerState", "secondMoveNextNorth")
+        elseif Config.MinerState == "secondMoveNextNorth" then
+            while Config.Z % Config.Pattern.Z > Config.Pattern.Z do
+                Turtle:Move("north")
+            end
+            Config:Update("MinerState", "secondMoveNextEast")
+        elseif Config.MinerState == "secondMoveNextEast" then
+            while Config.X % Config.Pattern.X < Config.Pattern.X do
+                Turtle:Move("east")
+            end
+            Config:Update("MinerState", "secondToTurnFirst")
+        elseif Config.MinerState == "secondToTurnFirst" then
+            Turtle:Turn("north")
             Config:Update("MinerState", "finished")
         elseif Config.MinerState == "finished" then
             self.running = false
@@ -122,7 +136,18 @@ end
 
 function Miner:GetStatus()
     Config.CurrentFuelLevel = turtle.getFuelLevel()
-    return Config
+    local status = {
+        X = Config.X,
+        Y = Config.Y,
+        Z = Config.Z,
+        Orientation = Config.Orientation,
+        MinerState = Config.MinerState,
+        FuelLevel = Config.CurrentFuelLevel,
+        Begin = Config.BeginCoords,
+        Threshold = Config.ThresholdCoords
+    }
+
+    return status
 end
 
 return setmetatable(Miner, {})

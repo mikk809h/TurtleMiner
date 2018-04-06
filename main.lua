@@ -8,6 +8,9 @@ Config:Init()
 local Block = loadfile(fs.combine(TurtleMiner.Path, "Block.lua"))()
 Block:Init()
 
+local Miner = loadfile(fs.combine(TurtleMiner.Path, "Miner.lua"))()
+
+
 Config.Orientation = Config.Orientation or 0
 Config.State       = Config.State or "idle"
 
@@ -101,6 +104,7 @@ function turnLeft()
     turtle.turnLeft()
     Config:Update("Orientation", Config.Orientation > 0 and Config.Orientation - 1 or 3)
 end
+
 
 function main()
     if Config.State == "idle" then
@@ -250,4 +254,21 @@ function main()
     end
 end
 
-while main() do sleep(1.5) end
+
+
+print("Running...")
+function newMain()
+    parallel.waitForAny(function()
+        print("Begun")
+        Miner:Main()
+    end, function()
+        while true do
+            print("UPDATE")
+            rednet.broadcast(textutils.serialize(Miner:GetStatus()))
+            sleep(10)
+        end
+    end)
+end
+
+newMain()
+--while main() do sleep(1.5) end

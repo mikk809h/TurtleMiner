@@ -137,22 +137,25 @@ function Block:DropBlacklisted()
             end
         end
     end
-    slotsHasItems = 0
-    for i = 1, 16 do
-        if turtle.getItemCount(i) > 0 then
-            slotsHasItems = slotsHasItems + 1
+    if false then
+        slotsHasItems = 0
+        for i = 1, 16 do
+            if turtle.getItemCount(i) > 0 then
+                slotsHasItems = slotsHasItems + 1
+            end
         end
-    end
-    if slotsHasItems >= 15 then
-        Config:Update("InventoryState", "full")
-    else
-        Config:Update("InventoryState", "normal")
+        if slotsHasItems >= 15 then
+            Config:Update("InventoryState", "full")
+        else
+            Config:Update("InventoryState", "normal")
+        end
     end
 end
 
 function Block:Mine(force)
+    self:Get()
     self:DropBlacklisted()
-    if force or self.Blacklisted == false then
+    if force == true or self.Blacklisted == false then
         self.Name = ""
         self.State = {}
         self.Metadata = -1
