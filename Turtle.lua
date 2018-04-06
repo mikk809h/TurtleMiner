@@ -3,7 +3,7 @@ local Turtle = {}
 TurtleMiner = TurtleMiner or {}
 TurtleMiner.Path    = TurtleMiner.Path or "/github"
 
-local TurtleLog = loadfile(fs.combine(TurtleMiner.Path, "TurtleLog.lua"))()
+Turtle.TurtleLog = loadfile(fs.combine(TurtleMiner.Path, "TurtleLog.lua"))()
 local Config = nil
 
 if not Config then
@@ -17,21 +17,13 @@ Config.Y = Config.Y or 0
 Config.X = Config.X or 0
 Config.Z = Config.Z or 0
 Config.IsGPSEnabled = Config.IsGPSEnabled or false
+
 Config.TurtleLog = Config.TurtleLog or {}
 
-
-Config.State       = Config.State or "idle"
-
-Config.Pattern = Config.Pattern or {
-    X = 2,
-    Z = 1,
-}
-
-Config.MinimumFuelLevel = Config.MinimumFuelLevel or 100
-Config.MaximumFuelLevel = Config.MaximumFuelLevel or 500
+Config.MinimumFuelLevel = Config.MinimumFuelLevel or 75
+Config.MaximumFuelLevel = Config.MaximumFuelLevel or 250
 Config.CurrentFuelLevel = turtle.getFuelLevel()
-TurtleLog:Set(Config.TurtleLog)
-
+Turtle.TurtleLog:Set(Config.TurtleLog)
 
 local Orientations = {
     [0] = "north",
@@ -45,7 +37,6 @@ function Turtle:Init()
     if modem then
         if gps.locate(2) then
             Config:Update("IsGPSEnabled", true)
-            self:Locate()
         end
     else
         Config:Update("IsGPSEnabled", false)
@@ -63,7 +54,7 @@ function Turtle:Move(direction, amount)
                 sleep(.5)
             end
             Config:Update("Y", Config.Y + 1)
-            TurtleLog:Add({Config.Orientation, "up"})
+            self.TurtleLog:Add({Config.Orientation, "up"})
         elseif direction == "down" then
             while not turtle.down() do
                 turtle.digDown()
@@ -71,7 +62,7 @@ function Turtle:Move(direction, amount)
                 sleep(.5)
             end
             Config:Update("Y", Config.Y - 1)
-            TurtleLog:Add({Config.Orientation, "down"})
+            self.TurtleLog:Add({Config.Orientation, "down"})
         elseif direction == "north" then
             self:Turn(direction)
             while not turtle.forward() do
@@ -80,7 +71,7 @@ function Turtle:Move(direction, amount)
                 sleep(.5)
             end
             Config:Update("Z", Config.Z - 1)
-            TurtleLog:Add({Config.Orientation, "north"})
+            self.TurtleLog:Add({Config.Orientation, "north"})
         elseif direction == "south" then
             self:Turn(direction)
             while not turtle.forward() do
@@ -89,7 +80,7 @@ function Turtle:Move(direction, amount)
                 sleep(.5)
             end
             Config:Update("Z", Config.Z + 1)
-            TurtleLog:Add({Config.Orientation, "south"})
+            self.TurtleLog:Add({Config.Orientation, "south"})
         elseif direction == "east" then
             self:Turn(direction)
             while not turtle.forward() do
@@ -98,7 +89,7 @@ function Turtle:Move(direction, amount)
                 sleep(.5)
             end
             Config:Update("X", Config.X + 1)
-            TurtleLog:Add({Config.Orientation, "east"})
+            self.TurtleLog:Add({Config.Orientation, "east"})
         elseif direction == "west" then
             self:Turn(direction)
             while not turtle.forward() do
@@ -107,7 +98,7 @@ function Turtle:Move(direction, amount)
                 sleep(.5)
             end
             Config:Update("X", Config.X - 1)
-            TurtleLog:Add({Config.Orientation, "west"})
+            self.TurtleLog:Add({Config.Orientation, "west"})
         elseif direction == "back" then
             while not turtle.back() do
                 turtle.turnRight()
@@ -120,10 +111,10 @@ function Turtle:Move(direction, amount)
             end
             if Config.Orientation == 0 or Config.Orientation == 2 then
                 Config:Update("Z", Config.Orientation == 0 and Config.Z + 1 or Config.Z - 1)
-                TurtleLog:Add({Config.Orientation, Config.Orientation == 0 and "north" or "south"})
+                self.TurtleLog:Add({Config.Orientation, Config.Orientation == 0 and "north" or "south"})
             elseif Config.Orientation == 1 or Config.Orientation == 3 then
                 Config:Update("X", Config.Orientation == 1 and Config.X - 1 or Config.X + 1)
-                TurtleLog:Add({Config.Orientation, Config.Orientation == 1 and "east" or "west"})
+                self.TurtleLog:Add({Config.Orientation, Config.Orientation == 1 and "east" or "west"})
             end
         else
             while not turtle.forward() do
@@ -133,10 +124,10 @@ function Turtle:Move(direction, amount)
             end
             if Config.Orientation == 0 or Config.Orientation == 2 then
                 Config:Update("Z", Config.Orientation == 0 and Config.Z - 1 or Config.Z + 1)
-                TurtleLog:Add({Config.Orientation, Config.Orientation == 0 and "north" or "south"})
+                self.TurtleLog:Add({Config.Orientation, Config.Orientation == 0 and "north" or "south"})
             elseif Config.Orientation == 1 or Config.Orientation == 3 then
                 Config:Update("X", Config.Orientation == 1 and Config.X + 1 or Config.X - 1)
-                TurtleLog:Add({Config.Orientation, Config.Orientation == 1 and "east" or "west"})
+                self.TurtleLog:Add({Config.Orientation, Config.Orientation == 1 and "east" or "west"})
             end
         end
     end
@@ -147,12 +138,12 @@ function Turtle:Turn(direction)
         while (direction == "north" and Config.Orientation ~= 0) or (direction == "east" and Config.Orientation ~= 1) or (direction == "south" and Config.Orientation ~= 2) or (direction == "west" and Config.Orientation ~= 3) do
             turtle.turnRight()
             Config:Update("Orientation", (Config.Orientation + 1) % 4)
-            TurtleLog:Add({Config.Orientation, direction, "turn"})
+            self.TurtleLog:Add({Config.Orientation, direction, "turn", Orientations[(Config.Orientation - 1) % 4]})
         end
     elseif direction == nil then
         turtle.turnRight()
         Config:Update("Orientation", (Config.Orientation + 1) % 4)
-        TurtleLog:Add({Config.Orientation, Orientations[Config.Orientation], "turn"})
+        self.TurtleLog:Add({Config.Orientation, Orientations[Config.Orientation], "turn", Orientations[(Config.Orientation - 1) % 4]})
     end
 end
 
@@ -329,30 +320,20 @@ local opposites = {
     north = "south",
     east = "west",
     south = "north",
-    west = "east",
-    right = "left",
-    left = "right"
+    west = "east"
 }
 
 function Turtle:UndoLastMove()
-    local lastAction = TurtleLog:GetLast()
+    local lastAction = self.TurtleLog:GetLast()
     if lastAction then
         local undoCommand = opposites[lastAction[2]]
         if lastAction[3] == "turn" then
-            self:TurnUnlogged(undoCommand)
+            self:TurnUnlogged(lastAction[4])
         else
             self:MoveUnlogged(undoCommand)
         end
-        TurtleLog:Remove()
+        self.TurtleLog:Remove()
     end
-end
-
-function Turtle:TurtleLog()
-    return TurtleLog.RawLog
-end
-
-function Turtle:ClearLog()
-    TurtleLog:Clear()
 end
 
 function Turtle:Locate()
@@ -363,21 +344,53 @@ function Turtle:Locate()
         self:MoveUnlogged("back")
 
         if (nz < z) then
-            Config:Update("GPS_ORIENTATION", 0)
+            Config:Update("Orientation", 0)
         elseif nx > x then
-            Config:Update("GPS_ORIENTATION", 1)
+            Config:Update("Orientation", 1)
         elseif nz > z then
-            Config:Update("GPS_ORIENTATION", 2)
+            Config:Update("Orientation", 2)
         elseif nx < x then
-            Config:Update("GPS_ORIENTATION", 3)
+            Config:Update("Orientation", 3)
         end
 
-        Config:Update("GPS_X", x)
-        Config:Update("GPS_Y", y)
-        Config:Update("GPS_Z", z)
-        return {X = Config.GPS_X, Y = Config.GPS_Y, Z = Config.GPS_Z, Orientation = Config.GPS_ORIENTATION}
+        Config:Update("X", x)
+        Config:Update("Y", y)
+        Config:Update("Z", z)
+        return {X = Config.X, Y = Config.Y, Z = Config.Z, Orientation = Config.Orientation}
     else
         return {X = Config.X, Y = Config.Y, Z = Config.Z, Orientation = Config.Orientation}
+    end
+end
+
+--[[
+    @params tbl { X = int x, Y = int y, Z = int z(, Orientation = int orientation) }
+]]
+function Turtle:Goto(goal)
+    local begin = { X = Config.X, Y = Config.Y, Z = Config.Z, Orientation = Config.Orientation }
+    local beginVector = vector.new(begin.X, begin.Y, begin.Z)
+    local goalVector = vector.new(goal.X, goal.Y, goal.Z)
+    local diffVector = goalVector - beginVector
+
+    if diffVector.y > 0 then
+        self:Move("up", diffVector.y)
+    elseif diffVector.y < 0 then
+        self:Move("down", -diffVector.y)
+    end
+
+    if diffVector.x > 0 then
+        self:Move("west", diffVector.x)
+    elseif diffVector.x < 0 then
+        self:Move("east", -diffVector.x)
+    end
+
+    if diffVector.z > 0 then
+        self:Move("south", diffVector.z)
+    elseif diffVector.z < 0 then
+        self:Move("north", -diffVector.z)
+    end
+
+    if goal.Orientation then
+        self:Turn(Orientations[goal.Orientation])
     end
 end
 

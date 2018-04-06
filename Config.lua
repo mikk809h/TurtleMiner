@@ -50,6 +50,7 @@ function mt.__index(k, v)
 end
 function mt.__newindex(t, k, v)
     t.Config[k] = v
+    Config:Save()
 end
 
 
