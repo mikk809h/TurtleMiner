@@ -11,6 +11,7 @@ function TurtleLog:Add(tbl)
     for i = 1, #self.RawLog do
         newLog[i+1] = self.RawLog[i]
     end
+    newLog[256] = nil
     self.RawLog = newLog
 end
 
@@ -22,6 +23,10 @@ function TurtleLog:Remove()
         newLog[i-1] = v
     end
     self.RawLog = newLog
+end
+
+function TurtleLog:Clear()
+    self.RawLog = {}
 end
 
 function TurtleLog:GetLast()
