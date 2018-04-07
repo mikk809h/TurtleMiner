@@ -1,7 +1,7 @@
 local Turtle = {}
 
 if not turtle then
-    return {}
+    return false
 end
 
 TurtleMiner = TurtleMiner or {}

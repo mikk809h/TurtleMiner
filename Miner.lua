@@ -7,6 +7,9 @@ Config = Config or loadfile(fs.combine(TurtleMiner.Path, "Config.lua"))()
 Config:Init()
 
 local Turtle = loadfile(fs.combine(TurtleMiner.Path, "Turtle.lua"))()
+if not Turtle then
+    return false, "Turtle failed to load"
+end
 Turtle:Init()
 
 local Block = loadfile(fs.combine(TurtleMiner.Path, "Block.lua"))()
