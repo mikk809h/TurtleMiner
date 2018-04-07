@@ -8,7 +8,8 @@ Config:Init()
 
 local Turtle = loadfile(fs.combine(TurtleMiner.Path, "Turtle.lua"))()
 if not Turtle then
-    return false, "Turtle failed to load"
+    printError("Turtle failed to load")
+    return false
 end
 Turtle:Init()
 
