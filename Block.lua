@@ -1,5 +1,5 @@
 local Block = {}
-
+-- TEST COMMENT
 Block.Name = ""
 Block.State = {}
 Block.Metadata = -1
