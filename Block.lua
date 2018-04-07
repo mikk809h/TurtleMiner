@@ -1,5 +1,4 @@
 local Block = {}
-
 Block.Name = ""
 Block.State = {}
 Block.Metadata = -1
