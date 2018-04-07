@@ -26,11 +26,7 @@ Config.ThresholdCoords  = vector.new(0, 7, 0);
 Config:Save()
 
 function Miner:Main()
-    --[[ Start securely by waiting 2 seconds for rednet and stuff
-
-
-    ]]
-    sleep(2)
+    sleep(.25)
     self.Running = true
     while self.Running do
         -- Check if forced termination and continue from last save.
