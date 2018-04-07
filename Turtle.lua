@@ -33,6 +33,7 @@ local Orientations = {
 }
 
 function Turtle:Init()
+    sleep(1.5) -- To secure correct modem initialization
     local modem = peripheral.find("modem", function(n, o) return o.isWireless() end)
     if modem then
         if gps.locate(2) then
@@ -249,7 +250,7 @@ function Turtle:Select(slot)
         for i = 1, 16 do
             if turtle.getItemCount(i) > 0 then
                 local info = turtle.getItemDetail(i)
-                if name == slot then
+                if info.name == slot then
                     turtle.select(i)
                     return true
                 end
@@ -356,10 +357,24 @@ function Turtle:Locate()
         Config:Update("X", x)
         Config:Update("Y", y)
         Config:Update("Z", z)
+        Config:Update("GPSLocated", true)
         return {X = Config.X, Y = Config.Y, Z = Config.Z, Orientation = Config.Orientation}
     else
         return {X = Config.X, Y = Config.Y, Z = Config.Z, Orientation = Config.Orientation}
     end
+end
+
+function Turtle:VerifyLocation()
+    local didLocate, vy, vz, vx = gps.locate(2)
+    if didLocate ~= nil then
+        vx = didLocate
+        local currentPosition = vector.new(vx, vy, vz)
+        if currentPosition.x ~= Config.X or currentPosition.y ~= Config.Y or currentPosition.z ~= Config.Z then
+            self:Locate()
+        end
+        return true
+    end
+    return false
 end
 
 --[[
