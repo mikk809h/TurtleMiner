@@ -8,12 +8,13 @@ Config:Init()
 
 local Turtle = loadfile(fs.combine(TurtleMiner.Path, "Turtle.lua"))()
 Turtle:Init()
+
 local Block = loadfile(fs.combine(TurtleMiner.Path, "Block.lua"))()
 Block:Init()
 
 Config.MinerState = Config.MinerState or "begin"
 
-Config.Pattern = Config.Pattern or {
+Config.Pattern = {
     X = 1,
     Z = 2,
 }
@@ -25,23 +26,40 @@ Config.ThresholdCoords  = vector.new(0, 7, 0);
 Config:Save()
 
 function Miner:Main()
+    --[[ Start securely by waiting 2 seconds for rednet and stuff
+
+
+    ]]
+    sleep(2)
     self.Running = true
     while self.Running do
         -- Check if forced termination and continue from last save.
         if Config.MinerState == "begin" then
-            Turtle:Locate()
+            if not Config.GPSLocated then
+                Turtle:Locate()
+            else
+                if not Turtle:VerifyLocation() then
+                    print("GPS ERROR")
+                    error()
+                end
+            end
+            while not Config.GPSLocated do
+                print("GPS Error")
+                Turtle:Locate()
+                sleep(3)
+            end
 
             if not Config.MinerHasBegun then
                 Config:Update("BeginCoords", vector.new(Config.X, Config.Y, Config.Z))
                 Config:Update("MinerHasBegun", true)
             end
-            while Config.Y >= Config.BeginCoords.y - 2 do
+            while Config.Y > Config.BeginCoords.y - 2 do
                 Turtle:Move("down")
             end
             Config:Update("MinerState", "beginFillHole")
         elseif Config.MinerState == "beginFillHole" then
-            Turtle:Select("minecraft:cobblestone")
-            if turtle.detectUp() then
+            print(Turtle:Select("minecraft:cobblestone") and "Found filler" or "No filler found")
+            if not turtle.detectUp() then
                 Turtle:Place("up")
             end
             Config:Update("MinerState", "firstToBedrock")
@@ -63,17 +81,18 @@ function Miner:Main()
             end
             Config:Update("MinerState", "firstToNextNorth")
         elseif Config.MinerState == "firstToNextNorth" then
-            while Config.Z - BeginCoords.z % Config.Pattern.Z ~= 0 do
+            while Config.Z > Config.BeginCoords.z - Config.Pattern.Z do
                 Turtle:Move("north")
             end
             Config:Update("MinerState", "firstToNextEast")
         elseif Config.MinerState == "firstToNextEast" then
-            while Config.X - BeginCoords.x % Config.Pattern.X ~= 0 do
+            while Config.X < Config.BeginCoords.x + Config.Pattern.X do
                 Turtle:Move("east")
             end
             Config:Update("MinerState", "firstToTurnSecond")
         elseif Config.MinerState == "firstToTurnSecond" then
             Turtle:Turn("north")
+            Config:Update("BeginCoords", vector.new(Config.X, Config.BeginCoords.y , Config.Z))
             Config:Update("MinerState", "secondToBedrock")
         elseif Config.MinerState == "secondToBedrock" then
             while not Block:IsBedrockBelow() do
@@ -88,7 +107,7 @@ function Miner:Main()
             end
             Config:Update("MinerState", "secondToUp")
         elseif Config.MinerState == "secondToUp" then
-            while Config.Y < BeginCoords.y - 2 do
+            while Config.Y < Config.BeginCoords.y - 2 do
                 while Config.Orientation <= 3 do
                     Block:Mine()
                     Turtle:Turn()
@@ -100,7 +119,7 @@ function Miner:Main()
             end
             Config:Update("MinerState", "secondToUpPrepareFill")
         elseif Config.MinerState == "secondToUpPrepareFill" then
-            while Config.Y < BeginCoords.y do
+            while Config.Y < Config.BeginCoords.y do
                 Turtle:Move("up")
             end
             Config:Update("MinerState", "secondToUpFill")
@@ -109,12 +128,12 @@ function Miner:Main()
             Turtle:Place("down")
             Config:Update("MinerState", "secondMoveNextNorth")
         elseif Config.MinerState == "secondMoveNextNorth" then
-            while Config.Z % Config.Pattern.Z > Config.Pattern.Z do
+            while Config.Z > Config.BeginCoords.z - Config.Pattern.Z do
                 Turtle:Move("north")
             end
             Config:Update("MinerState", "secondMoveNextEast")
         elseif Config.MinerState == "secondMoveNextEast" then
-            while Config.X % Config.Pattern.X < Config.Pattern.X do
+            while Config.X < Config.BeginCoords.x + Config.Pattern.X do
                 Turtle:Move("east")
             end
             Config:Update("MinerState", "secondToTurnFirst")
@@ -122,6 +141,7 @@ function Miner:Main()
             Turtle:Turn("north")
             Config:Update("MinerState", "finished")
         elseif Config.MinerState == "finished" then
+            Config.MinerState = "begin"
             self.running = false
             return true
         end
