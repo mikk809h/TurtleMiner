@@ -1,5 +1,9 @@
 local Turtle = {}
 
+if not turtle then
+    return {}
+end
+
 TurtleMiner = TurtleMiner or {}
 TurtleMiner.Path    = TurtleMiner.Path or "/github"
 
