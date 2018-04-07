@@ -1,4 +1,8 @@
 local Block = {}
+<<<<<<< HEAD
+=======
+-- TEST COMMENT
+>>>>>>> b8264fb09fc94d5d6c67066f772a3936efe95343
 Block.Name = ""
 Block.State = {}
 Block.Metadata = -1
